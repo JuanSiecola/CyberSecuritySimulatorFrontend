@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from 'react'
+﻿import { useEffect, useState, useCallback } from 'react'
 import * as dashboardApi from '../api/dashboard.api'
-import type { Empresa, ActividadActual, AccionResolucion } from '../types/dashboard.types'
+import type { Empresa, ActividadActual, ActividadResumen, AccionResolucion } from '../types/dashboard.types'
 
 function nivelRiesgoTexto(nivelRiesgo: number): 'alto' | 'medio' | 'bajo' {
     if (nivelRiesgo >= 60) return 'alto'
@@ -11,6 +11,7 @@ function nivelRiesgoTexto(nivelRiesgo: number): 'alto' | 'medio' | 'bajo' {
 export function useDashboard() {
     const [empresa, setEmpresa] = useState<Empresa | null>(null)
     const [actividadPendiente, setActividadPendiente] = useState<ActividadActual | null>(null)
+    const [pendientes, setPendientes] = useState<ActividadResumen[]>([])
     const [recientes, setRecientes] = useState<{ _id: string; descripcion: string; estado: string }[]>([])
     const [cargando, setCargando] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -36,6 +37,7 @@ export function useDashboard() {
                 dashboardApi.listarActividades(empresaId, 'pendiente'),
                 dashboardApi.listarActividades(empresaId),
             ])
+            setPendientes(pendientes)
 
             if (pendientes[0]) {
                 const detalle = await dashboardApi.obtenerDetalleActividad(pendientes[0]._id)
@@ -66,5 +68,5 @@ export function useDashboard() {
         await cargarTodo()
     }
 
-    return { empresa, actividadPendiente, recientes, cargando, error, resolver }
+    return { empresa, actividadPendiente, pendientes, recientes, cargando, error, resolver }
 }
