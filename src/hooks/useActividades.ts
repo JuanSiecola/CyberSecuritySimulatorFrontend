@@ -2,6 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 import * as dashboardApi from '../api/dashboard.api'
 import type { ActividadResumen } from '../types/dashboard.types'
 
+function extraerError(err: unknown, fallback: string) {
+    if (err && typeof err === 'object' && 'response' in err) {
+        const res = (err as { response?: { data?: { error?: string } } }).response
+        if (res?.data?.error) return res.data.error
+    }
+    if (err instanceof Error) return err.message
+    return fallback
+}
+
 export function useActividades() {
     const [actividades, setActividades] = useState<ActividadResumen[]>([])
     const [cargando, setCargando] = useState(true)
@@ -21,7 +30,7 @@ export function useActividades() {
 
             setActividades(await dashboardApi.listarActividades(empresaId))
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al cargar las actividades')
+            setError(extraerError(err, 'Error al cargar las actividades'))
         } finally {
             setCargando(false)
         }

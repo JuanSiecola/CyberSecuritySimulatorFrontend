@@ -45,5 +45,16 @@ export function useAuth() {
         }
     }
 
-    return { iniciarSesion, registrarse, error, cargando }
+    async function cerrarSesion() {
+        try {
+            await authApi.logout()
+        } catch {
+            // si el backend no responde igual se descarta la sesión local
+        }
+        localStorage.removeItem('token')
+        localStorage.removeItem('jugador')
+        navigate('/login')
+    }
+
+    return { iniciarSesion, registrarse, cerrarSesion, error, cargando }
 }

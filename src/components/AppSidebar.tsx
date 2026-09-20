@@ -1,5 +1,6 @@
-import { LayoutDashboard, Inbox, History, LogOut } from 'lucide-react'
+import { LayoutDashboard, Inbox, Terminal, History, LogOut } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 import {
     Sidebar,
     SidebarContent,
@@ -14,18 +15,15 @@ import {
 const items = [
     { title: 'Resumen', url: '/dashboard', icon: LayoutDashboard },
     { title: 'Actividad', url: '/actividad', icon: Inbox },
+    { title: 'Consola', url: '/consola', icon: Terminal },
     { title: 'Historial', url: '/historial', icon: History },
 ]
 
 export default function AppSidebar() {
     const location = useLocation()
     const navigate = useNavigate()
+    const { cerrarSesion } = useAuth()
 
-    function cerrarSesion() {
-        localStorage.removeItem('token')
-        localStorage.removeItem('jugador')
-        navigate('/login')
-    }
 
     return (
         <Sidebar className="border-slate-800 bg-slate-900 text-slate-100 [&_[data-slot=sidebar-inner]]:border-slate-800 [&_[data-slot=sidebar-inner]]:bg-slate-900">

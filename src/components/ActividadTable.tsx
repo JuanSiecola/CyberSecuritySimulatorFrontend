@@ -40,7 +40,7 @@ export default function ActividadTable({ actividades }: { actividades: Actividad
                 <TableHeader>
                     <TableRow className="border-slate-800 hover:bg-transparent">
                         <TableHead className="text-slate-400">Descripción</TableHead>
-                        <TableHead className="text-slate-400">Tipo</TableHead>
+                        <TableHead className="text-slate-400">Remitente</TableHead>
                         <TableHead className="text-slate-400">Nivel de riesgo</TableHead>
                         <TableHead className="text-slate-400">Estado</TableHead>
                         <TableHead className="text-right text-slate-400">Turno</TableHead>
@@ -53,7 +53,7 @@ export default function ActividadTable({ actividades }: { actividades: Actividad
                         return (
                             <TableRow key={actividad._id} className="border-slate-800 text-slate-300">
                                 <TableCell className="font-medium text-slate-100">{actividad.descripcion}</TableCell>
-                                <TableCell className="font-mono text-sm text-slate-400">{actividad.tipo}</TableCell>
+                                <TableCell className="font-mono text-sm text-slate-400">{actividad.correo.remitente}</TableCell>
                                 <TableCell>
                                     <Badge className={claseRiesgo(riesgo)}>{riesgo}</Badge>
                                 </TableCell>

@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
-import { ChevronDown, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar'
 import AppSidebar from './AppSidebar'
+import UserMenu from './UserMenu'
 import type { Jugador } from '../types/auth.types'
 
 function obtenerJugador(): Jugador | null {
@@ -29,7 +30,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     <div className="hidden min-w-0 flex-1 items-center gap-2 rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-slate-500 sm:flex sm:max-w-md"><Search className="size-4" /><span>Buscar correos, usuarios, dispositivos...</span></div>
                     <div className="ml-auto flex items-center gap-4 text-xs text-slate-400">
                         
-                        <div className="flex items-center gap-2 border-l border-slate-800 pl-4"><span className="flex size-8 items-center justify-center rounded-full bg-slate-700 text-[11px] text-slate-200">{iniciales}</span><span className="hidden text-right lg:block"><strong className="block text-slate-200">{nombre}</strong></span><ChevronDown className="size-4" /></div>
+                        <UserMenu nombre={nombre} email={jugador?.email} iniciales={iniciales} />
                     </div>
                 </header>
                 {children}

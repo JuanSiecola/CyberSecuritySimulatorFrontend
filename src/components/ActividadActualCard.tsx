@@ -1,3 +1,4 @@
+import { Mail } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import type { ActividadActual, AccionResolucion } from '../types/dashboard.types'
@@ -14,35 +15,44 @@ const badgePorRiesgo: Record<ActividadActual['nivelRiesgo'], string> = {
     bajo: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
 }
 
+// El backend siempre manda correo + logs juntos en cada ticket, así
+// que acá se muestran los dos, no uno u otro.
 function DetalleActividad({ actividad }: { actividad: ActividadActual }) {
-    if (actividad.tipo === 'email') {
-        return (
-            <dl className="font-mono text-sm text-slate-300 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
-                <dt className="text-slate-500">de:</dt>
-                <dd>{actividad.remitente}</dd>
-                <dt className="text-slate-500">para:</dt>
-                <dd>{actividad.destinatario}</dd>
-                {actividad.enlace && (
-                    <>
-                        <dt className="text-slate-500">enlace:</dt>
-                        <dd className="text-red-400 break-all">{actividad.enlace}</dd>
-                    </>
-                )}
-            </dl>
-        )
-    }
-
     return (
-        <dl className="font-mono text-sm text-slate-300 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
-            <dt className="text-slate-500">usuario:</dt>
-            <dd>{actividad.usuario}</dd>
-            <dt className="text-slate-500">ip:</dt>
-            <dd>{actividad.direccionIp}</dd>
-            <dt className="text-slate-500">ubicación:</dt>
-            <dd>{actividad.ubicacion}</dd>
-            <dt className="text-slate-500">dispositivo:</dt>
-            <dd>{actividad.dispositivo}</dd>
-        </dl>
+        <div className="flex flex-col gap-4">
+            <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-950/60">
+                <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-900/70 px-4 py-2.5">
+                    <Mail className="size-4 text-teal-300" />
+                    <span className="text-sm font-semibold text-slate-100">{actividad.correo.titulo}</span>
+                </div>
+                <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 px-4 py-3 text-sm">
+                    <dt className="text-slate-500">De</dt>
+                    <dd className="truncate font-medium text-slate-200">{actividad.correo.remitente}</dd>
+                    <dt className="text-slate-500">Para</dt>
+                    <dd className="truncate text-slate-300">{actividad.correo.destinatario}</dd>
+                    {actividad.correo.enlace && (
+                        <>
+                            <dt className="text-slate-500">Enlace</dt>
+                            <dd className="break-all font-mono text-sm text-red-400">{actividad.correo.enlace}</dd>
+                        </>
+                    )}
+                </dl>
+                <p className="border-t border-slate-800 px-4 py-3 text-sm leading-relaxed text-slate-300">
+                    {actividad.correo.contenido}
+                </p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Logs de evidencia</p>
+                <ul className="flex flex-col gap-1.5 font-mono text-sm text-slate-400">
+                    {actividad.logs.map((log, indice) => (
+                        <li key={indice} className="rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
+                            <span className="text-slate-500">[{log.archivo} {log.hora}]</span> {log.contenido}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
     )
 }
 
@@ -65,14 +75,11 @@ export default function ActividadActualCard({ actividad, onResolver, cargando }:
             <DetalleActividad actividad={actividad} />
 
             <div className="flex gap-2 pt-2">
-                <Button variant="outline" disabled={cargando} onClick={() => onResolver('ignorar')}>
-                    Ignorar
+                <Button variant="destructive" disabled={cargando} onClick={() => onResolver('bloquear')}>
+                    Bloquear
                 </Button>
-                <Button variant="destructive" disabled={cargando} onClick={() => onResolver('reportar')}>
-                    Reportar
-                </Button>
-                <Button disabled={cargando} onClick={() => onResolver('investigar')}>
-                    Investigar
+                <Button disabled={cargando} onClick={() => onResolver('permitir')}>
+                    Permitir
                 </Button>
             </div>
         </div>

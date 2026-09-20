@@ -3,6 +3,8 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import ActividadPage from './pages/ActividadPage'
+import ConsolaPage from './pages/ConsolaPage'
+import HistorialPage from './pages/HistorialPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import DashboardLayout from './components/DashboardLayout'
 
@@ -27,6 +29,26 @@ export default function AppRoutes() {
                     <ProtectedRoute>
                         <DashboardLayout>
                             <ActividadPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/consola"
+                element={
+                    <ProtectedRoute>
+                        <DashboardLayout>
+                            <ConsolaPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/historial"
+                element={
+                    <ProtectedRoute>
+                        <DashboardLayout>
+                            <HistorialPage />
                         </DashboardLayout>
                     </ProtectedRoute>
                 }
