@@ -1,6 +1,6 @@
 export type EstadoMetrica = 'bueno' | 'atencion' | 'critico'
 export type NivelRiesgo = 'alto' | 'medio' | 'bajo'
-export type AccionResolucion = 'ignorar' | 'reportar' | 'bloquear' | 'investigar'
+export type AccionResolucion = 'bloquear' | 'permitir'
 
 export type MetricaProps = {
     label: string
@@ -13,14 +13,17 @@ export type MetricaProps = {
 
 type ActividadEmail = {
     tipo: 'email'
+    titulo?: string
     remitente: string
     destinatario: string
     contenido: string
     enlace?: string
+    tieneAdjunto?: boolean
 }
 
 type ActividadLogs = {
     tipo: 'logs'
+    contenido: string
     direccionIp: string
     ubicacion: string
     dispositivo: string
