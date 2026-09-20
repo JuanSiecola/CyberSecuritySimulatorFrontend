@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import * as dashboardApi from '../api/dashboard.api'
 import type { Empresa, ActividadActual, ActividadResumen, AccionResolucion } from '../types/dashboard.types'
 
@@ -42,10 +42,10 @@ export function useDashboard() {
             if (pendientes[0]) {
                 const detalle = await dashboardApi.obtenerDetalleActividad(pendientes[0]._id)
                 setActividadPendiente({
+                    ...detalle,
                     id: detalle._id,
                     descripcion: detalle.descripcion,
                     nivelRiesgo: nivelRiesgoTexto(detalle.nivelRiesgo),
-                    ...detalle,
                 })
             } else {
                 setActividadPendiente(null)
@@ -63,10 +63,31 @@ export function useDashboard() {
         cargarTodo()
     }, [cargarTodo])
 
+    async function seleccionarActividad(actividadId: string) {
+        setError(null)
+        try {
+            const detalle = await dashboardApi.obtenerDetalleActividad(actividadId)
+            setActividadPendiente({
+                    ...detalle,
+                    id: detalle._id,
+                    descripcion: detalle.descripcion,
+                    nivelRiesgo: nivelRiesgoTexto(detalle.nivelRiesgo),
+                })
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Error al cargar el detalle de la actividad')
+        }
+    }
+
+    async function avanzarTurno() {
+        if (!empresa) return
+        await dashboardApi.avanzarTurno(empresa._id)
+        await cargarTodo()
+    }
+
     async function resolver(actividadId: string, accion: AccionResolucion) {
         await dashboardApi.resolverActividad(actividadId, accion)
         await cargarTodo()
     }
 
-    return { empresa, actividadPendiente, pendientes, recientes, cargando, error, resolver }
+    return { empresa, actividadPendiente, pendientes, recientes, cargando, error, seleccionarActividad, avanzarTurno, resolver }
 }

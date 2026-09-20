@@ -12,11 +12,16 @@ export async function obtenerEmpresa(empresaId: string) {
 }
 
 export async function listarActividades(empresaId: string, estado?: string) {
-    const { data } = await axiosClient.get<{ actividades: ActividadResumen[] }>(
+    const { data } = await axiosClient.get<ActividadResumen[] | { actividades: ActividadResumen[] }>(
         `/empresas/${empresaId}/actividades`,
         { params: estado ? { estado } : undefined }
     )
-    return data.actividades
+    return Array.isArray(data) ? data : data.actividades
+}
+
+export async function avanzarTurno(empresaId: string) {
+    const { data } = await axiosClient.post(`/empresas/${empresaId}/avanzar`)
+    return data
 }
 
 export async function obtenerDetalleActividad(actividadId: string) {
