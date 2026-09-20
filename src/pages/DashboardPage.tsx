@@ -11,7 +11,7 @@ function formatoSigno(valor: number) {
 }
 
 export default function DashboardPage() {
-    const { empresa, actividadPendiente, pendientes, resueltasTurno, ultimoResultado, cargando, error, resolver, avanzarTurno, rendirse } = useDashboard()
+    const { empresa, actividadPendiente, pendientes, resueltasTurno, ultimoResultado, cargando, error, resolver, avanzarTurno, rendirse, seleccionarActividad } = useDashboard()
     const [confirmandoRendicion, setConfirmandoRendicion] = useState(false)
 
     if (cargando && !empresa) return <div className="p-8 text-slate-400">Cargando partida...</div>
@@ -27,6 +27,11 @@ export default function DashboardPage() {
 
     function irALaActividadActual() {
         document.getElementById('actividad-actual')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    function analizarActividad(actividadId: string) {
+        seleccionarActividad(actividadId)
+        irALaActividadActual()
     }
 
     return (
@@ -97,7 +102,7 @@ export default function DashboardPage() {
                     <section className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/70">
                         <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4"><div className="flex items-center gap-3"><Activity className="size-5 text-teal-300" /><div><h2 className="font-medium text-slate-100">Actividades pendientes</h2><p className="text-xs text-slate-500">Atiende cada actividad para avanzar el turno.</p></div></div><span className="text-xs text-slate-400">{pendientes.length} actividades</span></div>
                         <div className="divide-y divide-slate-800/80">
-                            {pendientes.length ? pendientes.map((actividad, index) => { const Icon = iconosDescripcion[index % iconosDescripcion.length]; return <div key={actividad._id} className="flex items-center gap-3 px-5 py-3.5"><div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-teal-400/10 text-teal-300"><Icon className="size-4" /></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-slate-200">{actividad.descripcion}</p><p className="text-xs text-slate-500">Correo de {actividad.correo.remitente}</p></div><span className="hidden rounded-full border border-slate-700 bg-slate-800 px-2 py-1 text-[10px] text-slate-400 sm:inline">Pendiente</span><span className="hidden items-center gap-1 text-xs text-slate-400 md:flex"><Clock3 className="size-3.5" /> Turno {actividad.turno}</span><button className="inline-flex items-center gap-1 rounded-md border border-teal-300/40 bg-teal-300/10 px-3 py-2 text-xs font-medium text-teal-200 transition-colors hover:bg-teal-300/20" disabled={actividadPendiente?.id !== actividad._id} onClick={irALaActividadActual}>Analizar <ArrowRight className="size-3.5" /></button></div> }) : <div className="flex flex-col items-center gap-3 px-5 py-10 text-center text-sm text-slate-500"><span>No hay actividades pendientes por ahora.</span>{!partidaTerminada && (
+                            {pendientes.length ? pendientes.map((actividad, index) => { const Icon = iconosDescripcion[index % iconosDescripcion.length]; return <div key={actividad._id} className="flex items-center gap-3 px-5 py-3.5"><div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-teal-400/10 text-teal-300"><Icon className="size-4" /></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-slate-200">{actividad.descripcion}</p><p className="text-xs text-slate-500">Correo de {actividad.correo.remitente}</p></div><span className="hidden rounded-full border border-slate-700 bg-slate-800 px-2 py-1 text-[10px] text-slate-400 sm:inline">Pendiente</span><span className="hidden items-center gap-1 text-xs text-slate-400 md:flex"><Clock3 className="size-3.5" /> Turno {actividad.turno}</span><button className="inline-flex items-center gap-1 rounded-md border border-teal-300/40 bg-teal-300/10 px-3 py-2 text-xs font-medium text-teal-200 transition-colors hover:border-teal-200/70 hover:bg-teal-300/20 hover:text-teal-100" onClick={() => analizarActividad(actividad._id)}>Analizar <ArrowRight className="size-3.5" /></button></div> }) : <div className="flex flex-col items-center gap-3 px-5 py-10 text-center text-sm text-slate-500"><span>No hay actividades pendientes por ahora.</span>{!partidaTerminada && (
                                 <Button
                                     size="lg"
                                     disabled={cargando}

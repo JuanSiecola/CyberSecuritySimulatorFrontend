@@ -57,8 +57,6 @@ export type Empresa = {
 }
 
 // Campos comunes a la lista y al detalle de un ticket.
-// esMalicioso solo viene cuando estado !== 'pendiente': el backend lo
-// oculta a propósito mientras el ticket sigue abierto.
 type TicketBase = {
     _id: string
     descripcion: string

@@ -27,7 +27,7 @@ export function useDashboard() {
     const [empresa, setEmpresa] = useState<Empresa | null>(null)
     const [actividadPendiente, setActividadPendiente] = useState<ActividadActual | null>(null)
     const [pendientes, setPendientes] = useState<ActividadResumen[]>([])
-    const [recientes, setRecientes] = useState<{ _id: string; descripcion: string; estado: string }[]>([])
+    const [recientes, setRecientes] = useState<ActividadResumen[]>([])
     const [resueltasTurno, setResueltasTurno] = useState(0)
     const [ultimoResultado, setUltimoResultado] = useState<ResolverResultado | null>(null)
     const [cargando, setCargando] = useState(true)
@@ -50,14 +50,14 @@ export function useDashboard() {
             }
             setEmpresa(empresaActual)
 
-            const [pendientes, todas] = await Promise.all([
+            const [pendientesActuales, todas] = await Promise.all([
                 dashboardApi.listarActividades(empresaId, 'pendiente'),
                 dashboardApi.listarActividades(empresaId),
             ])
-            setPendientes(pendientes)
+            setPendientes(pendientesActuales)
 
-            if (pendientes[0]) {
-                const detalle = await dashboardApi.obtenerDetalleActividad(pendientes[0]._id)
+            if (pendientesActuales[0]) {
+                const detalle = await dashboardApi.obtenerDetalleActividad(pendientesActuales[0]._id)
                 setActividadPendiente({
                     ...detalle,
                     id: detalle._id,
@@ -79,6 +79,20 @@ export function useDashboard() {
     useEffect(() => {
         cargarTodo()
     }, [cargarTodo])
+
+    async function seleccionarActividad(actividadId: string) {
+        setError(null)
+        try {
+            const detalle = await dashboardApi.obtenerDetalleActividad(actividadId)
+            setActividadPendiente({
+                ...detalle,
+                id: detalle._id,
+                nivelRiesgo: nivelRiesgoTexto(detalle.nivelRiesgo),
+            })
+        } catch (err) {
+            setError(extraerError(err, 'Error al cargar el detalle de la actividad'))
+        }
+    }
 
     async function resolver(actividadId: string, accion: AccionResolucion) {
         setCargando(true)
@@ -121,5 +135,18 @@ export function useDashboard() {
         }
     }
 
-    return { empresa, actividadPendiente, pendientes, recientes, resueltasTurno, ultimoResultado, cargando, error, resolver, avanzarTurno, rendirse }
+    return {
+        empresa,
+        actividadPendiente,
+        pendientes,
+        recientes,
+        resueltasTurno,
+        ultimoResultado,
+        cargando,
+        error,
+        resolver,
+        avanzarTurno,
+        rendirse,
+        seleccionarActividad,
+    }
 }
