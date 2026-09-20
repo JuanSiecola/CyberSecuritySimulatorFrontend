@@ -1,4 +1,4 @@
-import { Mail } from 'lucide-react'
+import { Mail, Terminal } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { ShieldAlert, ShieldCheck, ShieldQuestion } from 'lucide-react'
@@ -16,8 +16,9 @@ const riesgoConfig: Record<ActividadActual['nivelRiesgo'], { etiqueta: string; i
     bajo: { etiqueta: 'Riesgo bajo', icono: ShieldCheck, clases: 'border-emerald-300/40 bg-emerald-400/15 text-emerald-100 shadow-sm shadow-emerald-950/30' },
 }
 
-// El backend siempre manda correo + logs juntos en cada ticket, así
-// que acá se muestran los dos, no uno u otro.
+// La pantalla de la actividad solo muestra el correo: los logs de
+// evidencia se investigan aparte, en la Consola, para que el jugador
+// tenga que ir a buscarlos en vez de tenerlos ya servidos acá.
 function DetalleActividad({ actividad }: { actividad: ActividadActual }) {
     return (
         <div className="flex flex-col gap-4">
@@ -38,20 +39,14 @@ function DetalleActividad({ actividad }: { actividad: ActividadActual }) {
                         </>
                     )}
                 </dl>
-                <p className="border-t border-slate-800 px-4 py-3 text-sm leading-relaxed text-slate-300">
+                <p className="border-t border-slate-800 px-4 py-3 text-sm leading-relaxed whitespace-pre-line text-slate-300">
                     {actividad.correo.contenido}
                 </p>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Logs de evidencia</p>
-                <ul className="flex flex-col gap-1.5 font-mono text-sm text-slate-400">
-                    {actividad.logs.map((log, indice) => (
-                        <li key={indice} className="rounded-md border border-slate-800 bg-slate-950/60 px-3 py-2">
-                            <span className="text-slate-500">[{log.archivo} {log.hora}]</span> {log.contenido}
-                        </li>
-                    ))}
-                </ul>
+            <div className="flex items-center gap-2 rounded-md border border-slate-800 bg-slate-950/40 px-3 py-2 text-xs text-slate-500">
+                <Terminal className="size-3.5 text-teal-300" />
+                ¿Necesitás más pistas? Los logs de evidencia de este ticket están en la Consola.
             </div>
         </div>
     )

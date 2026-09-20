@@ -11,7 +11,7 @@ function formatoSigno(valor: number) {
 }
 
 export default function DashboardPage() {
-    const { empresa, actividadPendiente, pendientes, resueltasTurno, ultimoResultado, cargando, error, resolver, avanzarTurno, rendirse, seleccionarActividad } = useDashboard()
+    const { empresa, actividadPendiente, pendientes, resueltasTurno, ultimoResultado, cargando, error, resolver, avanzarTurno, rendirse, reiniciarPartida, seleccionarActividad } = useDashboard()
     const [confirmandoRendicion, setConfirmandoRendicion] = useState(false)
 
     if (cargando && !empresa) return <div className="p-8 text-slate-400">Cargando partida...</div>
@@ -97,7 +97,13 @@ export default function DashboardPage() {
 
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
                 <div className="space-y-5">
-                    {partidaTerminada && <ResultadoPartida resultado={empresa.estado === 'victoria' ? 'victoria' : 'derrota'} />}
+                    {partidaTerminada && (
+                        <ResultadoPartida
+                            resultado={empresa.estado === 'victoria' ? 'victoria' : 'derrota'}
+                            onReiniciar={reiniciarPartida}
+                            cargando={cargando}
+                        />
+                    )}
                     {!partidaTerminada && actividadPendiente && <div id="actividad-actual"><ActividadActualCard actividad={actividadPendiente} onResolver={(accion) => resolver(actividadPendiente.id, accion)} cargando={cargando} /></div>}
                     <section className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/70">
                         <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4"><div className="flex items-center gap-3"><Activity className="size-5 text-teal-300" /><div><h2 className="font-medium text-slate-100">Actividades pendientes</h2><p className="text-xs text-slate-500">Atiende cada actividad para avanzar el turno.</p></div></div><span className="text-xs text-slate-400">{pendientes.length} actividades</span></div>

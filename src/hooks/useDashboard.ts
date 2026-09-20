@@ -135,6 +135,24 @@ export function useDashboard() {
         }
     }
 
+    async function reiniciarPartida() {
+        setCargando(true)
+        setError(null)
+        try {
+            const nuevaEmpresa = await dashboardApi.crearEmpresa()
+            const jugadorGuardado = JSON.parse(localStorage.getItem('jugador') ?? 'null')
+            localStorage.setItem(
+                'jugador',
+                JSON.stringify({ ...jugadorGuardado, empresaId: nuevaEmpresa._id })
+            )
+            setUltimoResultado(null)
+            await cargarTodo()
+        } catch (err) {
+            setError(extraerError(err, 'Error al reiniciar la partida'))
+            setCargando(false)
+        }
+    }
+
     return {
         empresa,
         actividadPendiente,
@@ -147,6 +165,7 @@ export function useDashboard() {
         resolver,
         avanzarTurno,
         rendirse,
+        reiniciarPartida,
         seleccionarActividad,
     }
 }
