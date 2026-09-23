@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useDashboard } from '../hooks/useDashboard'
 import MetricCard from '../components/MetricCard'
 import ActividadActualCard from '../components/ActividadActualCard'
@@ -9,10 +9,19 @@ import { Activity, ArrowRight, CalendarDays, CheckCircle2, Clock3, FileText, Fla
 function formatoSigno(valor: number) {
     return valor >= 0 ? `+${valor}` : `${valor}`
 }
+function obtenerNombreJugador() {
+    try {
+        const jugador = JSON.parse(localStorage.getItem('jugador') ?? 'null') as { nombre?: unknown }
+        return typeof jugador?.nombre === 'string' && jugador.nombre.trim() ? jugador.nombre.trim() : 'Analista'
+    } catch {
+        return 'Analista'
+    }
+}
 
 export default function DashboardPage() {
     const { empresa, actividadPendiente, pendientes, resueltasTurno, ultimoResultado, cargando, error, resolver, avanzarTurno, rendirse, reiniciarPartida, seleccionarActividad } = useDashboard()
     const [confirmandoRendicion, setConfirmandoRendicion] = useState(false)
+    const nombreJugador = obtenerNombreJugador()
 
     if (cargando && !empresa) return <div className="p-8 text-slate-400">Cargando partida...</div>
     if (error || !empresa) return <div className="p-8 text-red-400">{error ?? 'No se pudo cargar la empresa'}</div>
@@ -36,6 +45,12 @@ export default function DashboardPage() {
 
     return (
         <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-5 px-4 pb-8 pt-5 sm:px-6 lg:px-8">
+            <section className="relative overflow-hidden rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-5 py-5 sm:px-6">
+                <div className="pointer-events-none absolute -right-10 -top-16 size-48 rounded-full border border-emerald-300/10" />
+                <p className="relative text-xs uppercase tracking-[0.2em] text-emerald-300">Sesión iniciada correctamente</p>
+                <h1 className="relative mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">Bienvenido, {nombreJugador}</h1>
+                <p className="relative mt-2 max-w-2xl text-sm leading-6 text-slate-400">Tu centro de operaciones está listo. Revisá las actividades y tomá el control del próximo incidente.</p>
+            </section>
             <div className="flex items-end justify-between gap-4">
                 <div><p className="text-xs uppercase tracking-[0.18em] text-teal-300">Centro de operaciones</p><h1 className="mt-1 text-2xl font-semibold text-slate-100">Resumen de seguridad</h1><p className="mt-1 text-sm text-slate-400">Revisa y atiende las actividades antes de avanzar el turno.</p></div>
                 <div className="hidden items-center gap-3 sm:flex">
@@ -48,7 +63,7 @@ export default function DashboardPage() {
                     {!partidaTerminada && (
                         confirmandoRendicion ? (
                             <div className="flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 py-1 pr-1 pl-3.5 text-sm text-red-300">
-                                <span>¿Rendirte?</span>
+                                <span>Â¿Rendirte?</span>
                                 <Button
                                     size="sm"
                                     variant="destructive"
@@ -56,7 +71,7 @@ export default function DashboardPage() {
                                     onClick={() => { setConfirmandoRendicion(false); rendirse() }}
                                     className="rounded-full"
                                 >
-                                    Sí, rendirme
+                                    SÃ­, rendirme
                                 </Button>
                                 <Button
                                     size="sm"
@@ -89,9 +104,9 @@ export default function DashboardPage() {
 
             {ultimoResultado && (
                 <div className={`rounded-lg border px-4 py-3 text-sm ${ultimoResultado.correcta ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-red-500/30 bg-red-500/10 text-red-300'}`}>
-                    {ultimoResultado.correcta ? 'Decisión correcta.' : 'Decisión incorrecta.'}{' '}
+                    {ultimoResultado.correcta ? 'DecisiÃ³n correcta.' : 'DecisiÃ³n incorrecta.'}{' '}
                     {ultimoResultado.esMaliciosa ? 'La actividad era maliciosa.' : 'La actividad no era maliciosa.'}{' '}
-                    Impacto: seguridad {formatoSigno(ultimoResultado.impacto.seguridad)}, reputación {formatoSigno(ultimoResultado.impacto.reputacion)}, dinero {formatoSigno(ultimoResultado.impacto.dinero)}.
+                    Impacto: seguridad {formatoSigno(ultimoResultado.impacto.seguridad)}, reputaciÃ³n {formatoSigno(ultimoResultado.impacto.reputacion)}, dinero {formatoSigno(ultimoResultado.impacto.dinero)}.
                 </div>
             )}
 
@@ -129,3 +144,6 @@ export default function DashboardPage() {
         </div>
     )
 }
+
+
+
