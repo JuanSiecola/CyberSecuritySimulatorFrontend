@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import type { LogEntry } from '../types/dashboard.types'
+import { ARCHIVOS_LOG_INFO, buscarEnGlosario, GLOSARIO_TERMINOS } from '../data/glosarioLogs'
 
-type Linea = { tipo: 'comando' | 'salida'; texto: string }
+type Linea = { tipo: 'comando' | 'salida' | 'sugerencia'; texto: string }
 
 const AYUDA = [
-    'Comandos disponibles:',
-    '  ls                          lista los archivos de log del ticket actual',
-    '  cat <archivo>                muestra el contenido completo de un log',
-    '  grep <patron> [archivo]      busca <patron> en un log (o en todos si se omite)',
-    '  clear                        limpia la pantalla',
-    '  help                         muestra esta ayuda',
+    'Comandos:',
+    '  ls                     lista los logs del ticket',
+    '  cat <archivo>          muestra un log completo',
+    '  grep <patron> [archivo]  busca un patrón',
+    '  man <archivo>          qué es ese log (ej: man mail.log)',
+    '  ayuda <termino>        explica un término (ej: ayuda spf)',
+    '  clear                  limpia la pantalla',
 ]
 
 function formatearLog(log: LogEntry) {
@@ -64,15 +66,35 @@ function ejecutar(linea: string, logs: LogEntry[]): string[] | 'CLEAR' {
             return coincidencias.length ? coincidencias.map(formatearLog) : ['(sin coincidencias)']
         }
 
+        case 'man': {
+            const archivo = args[0]
+            if (!archivo) return ['uso: man <archivo>  (ej: man mail.log)']
+            const info = ARCHIVOS_LOG_INFO.find((a) => a.archivo === archivo)
+            if (!info) return [`man: no existe "${archivo}"`, `Archivos: ${ARCHIVOS_LOG_INFO.map((a) => a.archivo).join(', ')}`]
+            return [info.titulo, info.descripcion]
+        }
+
+        case 'ayuda': {
+            const consulta = args.join(' ')
+            if (!consulta) return ['uso: ayuda <termino>  (ej: ayuda spf)', GLOSARIO_TERMINOS.map((t) => t.id).join(', ')]
+            const resultados = buscarEnGlosario(consulta)
+            if (!resultados.length) return [`ayuda: no encontré "${consulta}". Probá "ayuda" sola.`]
+            return resultados.flatMap((t) => [`${t.termino} (${t.dondeAparece}): ${t.explicacion}`])
+        }
+
         default:
             return [`bash: ${comando}: comando no encontrado (probá "help")`]
     }
 }
 
-export default function TerminalConsola({ logs }: { logs: LogEntry[] }) {
-    const [historial, setHistorial] = useState<Linea[]>([
-        { tipo: 'salida', texto: 'SecureWay OS v1.0 — escribí "help" para ver los comandos.' },
-    ])
+export default function TerminalConsola({ logs, pistaInicial }: { logs: LogEntry[]; pistaInicial?: string }) {
+    const [historial, setHistorial] = useState<Linea[]>(() => {
+        const inicial: Linea[] = [
+            { tipo: 'salida', texto: 'SecureWay OS v1.0 — escribí "help" para ver los comandos.' },
+        ]
+        if (pistaInicial) inicial.push({ tipo: 'sugerencia', texto: pistaInicial })
+        return inicial
+    })
     const [entrada, setEntrada] = useState('')
     const [comandosPrevios, setComandosPrevios] = useState<string[]>([])
     const [indiceHistorial, setIndiceHistorial] = useState<number | null>(null)
@@ -129,6 +151,12 @@ export default function TerminalConsola({ logs }: { logs: LogEntry[] }) {
         }
     }
 
+    function claseLinea(tipo: Linea['tipo']) {
+        if (tipo === 'comando') return 'text-slate-200'
+        if (tipo === 'sugerencia') return 'whitespace-pre-wrap text-amber-300/90'
+        return 'whitespace-pre-wrap text-emerald-400/90'
+    }
+
     return (
         <div
             className="flex h-[60vh] flex-col rounded-lg border border-slate-800 bg-black font-mono text-sm text-emerald-400 shadow-inner"
@@ -143,8 +171,8 @@ export default function TerminalConsola({ logs }: { logs: LogEntry[] }) {
 
             <div className="flex-1 overflow-y-auto px-4 py-3">
                 {historial.map((linea, indice) => (
-                    <div key={indice} className={linea.tipo === 'comando' ? 'text-slate-200' : 'whitespace-pre-wrap text-emerald-400/90'}>
-                        {linea.tipo === 'comando' ? <>&gt; {linea.texto}</> : linea.texto}
+                    <div key={indice} className={claseLinea(linea.tipo)}>
+                        {linea.tipo === 'comando' ? <>&gt; {linea.texto}</> : linea.tipo === 'sugerencia' ? <>» {linea.texto}</> : linea.texto}
                     </div>
                 ))}
                 <div ref={finRef} />

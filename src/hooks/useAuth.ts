@@ -37,6 +37,9 @@ export function useAuth() {
             const { token, jugador } = await authApi.registrar(nombre, email, password)
             localStorage.setItem('token', token)
             localStorage.setItem('jugador', JSON.stringify(jugador))
+            // Cuenta nueva: que vea el tutorial sí o sí, aunque este
+            // navegador ya lo haya marcado como visto con otra cuenta.
+            localStorage.removeItem('secureway-onboarding-visto')
             navigate('/dashboard')
         } catch (err) {
             setError(extraerError(err, 'Error al registrarse'))
